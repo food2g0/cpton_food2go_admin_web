@@ -4,42 +4,31 @@ import 'package:cpton_food2go_admin_web/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-
-
-class HomeScreen extends StatefulWidget
-{
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-
-
-class _HomeScreenState extends State<HomeScreen>
-{
+class _HomeScreenState extends State<HomeScreen> {
   String timeText = "";
   String dateText = "";
 
-
-  String formatCurrentLiveTime(DateTime time)
-  {
+  String formatCurrentLiveTime(DateTime time) {
     return DateFormat("hh:mm:ss a").format(time);
   }
 
-  String formatCurrentDate(DateTime date)
-  {
+  String formatCurrentDate(DateTime date) {
     return DateFormat("dd MMMM, yyyy").format(date);
   }
 
-  getCurrentLiveTime()
-  {
+  getCurrentLiveTime() {
     final DateTime timeNow = DateTime.now();
     final String liveTime = formatCurrentLiveTime(timeNow);
     final String liveDate = formatCurrentDate(timeNow);
 
-    if(this.mounted)
-    {
+    if (this.mounted) {
       setState(() {
         timeText = liveTime;
         dateText = liveDate;
@@ -48,8 +37,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   @override
-  void initState()
-  {
+  void initState() {
     super.initState();
 
     //time
@@ -58,220 +46,82 @@ class _HomeScreenState extends State<HomeScreen>
     //date
     dateText = formatCurrentDate(DateTime.now());
 
-    Timer.periodic(const Duration(seconds: 1), (timer)
-    {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       getCurrentLiveTime();
     });
   }
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Scaffold(
-      backgroundColor: Colors.black,
+  Widget build(BuildContext context) {
+    return  Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          color: AppColors().black1,
-        ),
-        title: const Text(
-          "Admin Web Portal",
-          style: TextStyle(
-            fontSize: 20,
-            letterSpacing: 3,
-            color: Colors.white,
+        backgroundColor: Colors.lightBlue,
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Admin Dashboard'),
+              Text(
+                '$timeText $dateText',
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
           ),
         ),
-        centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-
-            Padding(
-              padding: const EdgeInsets.all(12.0),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
               child: Text(
-                timeText + "\n" + dateText,
-                style: const TextStyle(
-                  fontSize: 20,
+                'Admin Menu',
+                style: TextStyle(
                   color: Colors.white,
-                  letterSpacing: 3,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
                 ),
               ),
             ),
-
-            //users activate and block accounts button ui
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //active
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.person_add, color: Colors.white,),
-                  label: Text(
-                    "Activate Users".toUpperCase() + "\n" + "Accounts".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(40),
-                    primary: AppColors().green,
-                  ),
-                  onPressed: ()
-                  {
-
-                  },
-                ),
-
-                const SizedBox(width: 20,),
-
-                //block
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.block_flipped, color: Colors.white,),
-                  label: Text(
-                    "Block Users".toUpperCase() + "\n" + "Accounts".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(40),
-                    primary: AppColors().red,
-                  ),
-                  onPressed: ()
-                  {
-
-                  },
-                ),
-              ],
+            ListTile(
+              title: Text('Dashboard'),
+              onTap: () {
+                // Handle dashboard tap
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Users'),
+              onTap: () {
+                // Handle users tap
+                Navigator.pop(context);
+              },
             ),
 
-            //sellers activate and block accounts button ui
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //active
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.person_add, color: Colors.white,),
-                  label: Text(
-                    "Activate Sellers".toUpperCase() + "\n" + "Accounts".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(40),
-                    primary: AppColors().green,
-                  ),
-                  onPressed: ()
-                  {
-
-                  },
-                ),
-
-                const SizedBox(width: 20,),
-
-                //block
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.block_flipped, color: Colors.white,),
-                  label: Text(
-                    "Block Sellers".toUpperCase() + "\n" + "Accounts".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(40),
-                    primary: AppColors().red,
-                  ),
-                  onPressed: ()
-                  {
-
-                  },
-                ),
-              ],
+            ListTile(
+              title: Text('Products'),
+              onTap: () {
+                // Handle products tap
+                Navigator.pop(context);
+              },
             ),
-
-            //riders activate and block accounts button ui
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //active
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.person_add, color: Colors.white,),
-                  label: Text(
-                    "Activate Riders".toUpperCase() + "\n" + "Accounts".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(40),
-                    primary: AppColors().green,
-                  ),
-                  onPressed: ()
-                  {
-
-                  },
-                ),
-
-                const SizedBox(width: 20,),
-
-                //block
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.block_flipped, color: Colors.white,),
-                  label: Text(
-                    "Block Riders".toUpperCase() + "\n" + "Accounts".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(40),
-                    primary: AppColors().red,
-                  ),
-                  onPressed: ()
-                  {
-
-                  },
-                ),
-              ],
-            ),
-
-            //logout button
-            ElevatedButton.icon(
-              icon: const Icon(Icons.logout, color: Colors.white,),
-              label: Text(
-                "Logout".toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  letterSpacing: 3,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(40),
-                primary: Colors.amber,
-              ),
-              onPressed: ()
-              {
-
+            ListTile(
+              title: Text('Settings'),
+              onTap: () {
+                // Handle settings tap
+                Navigator.pop(context);
               },
             ),
           ],
+        ),
+      ),
+      body: Center(
+        child: Text(
+          'Welcome to the Admin Dashboard!',
+          style: TextStyle(fontSize: 24),
         ),
       ),
     );

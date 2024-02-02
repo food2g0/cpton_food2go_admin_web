@@ -1,5 +1,6 @@
 import 'package:cpton_food2go_admin_web/authentication/login_screen.dart';
 import 'package:cpton_food2go_admin_web/main_screen/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: FirebaseAuth.instance.currentUser == null ? const LoginScreen() : const HomeScreen(),
     );
   }
 }
