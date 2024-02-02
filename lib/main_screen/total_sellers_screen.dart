@@ -33,7 +33,10 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
         'sellersUID': doc['sellersUID'],
         'sellersEmail': doc['sellersEmail'],
         'sellersAddress': doc['sellersAddress'],
+        'sellerPhoto': doc['sellersImageUrl'],
+        'sellerEarnings': doc['earnings'],
         'sellersphone': doc['sellersphone'],
+
         'status': doc['status'],
       };
     }).toList();
