@@ -48,49 +48,6 @@ class _TotalOrderScreenState extends State<TotalOrderScreen> {
   }
 
 
-  Future<void> updateOrderStatus(String orderId) async {
-    CollectionReference orders = FirebaseFirestore.instance.collection('orders');
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Update Order Status'),
-          content: Column(
-            children: [
-              Text('Enter the reason for updating the status:'),
-              TextField(
-                controller: blockingReasonController,
-                decoration: InputDecoration(labelText: 'Reason'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await orders.doc(orderId).update({
-                  'status': 'normal',
-                  'blockingReason': blockingReasonController.text,
-                });
-
-                blockingReasonController.clear();
-                Navigator.of(context).pop();
-              },
-              child: Text('Update Status'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-
   List<Map<String, dynamic>> filterOrders(String query, List<Map<String, dynamic>> orders) {
     return orders.where((order) =>
     order['orderBy'].toLowerCase().contains(query.toLowerCase()) ||
@@ -126,16 +83,54 @@ class _TotalOrderScreenState extends State<TotalOrderScreen> {
       },
     );
   }
+  void confirmPayment(String orderId, String userId) async {
+    CollectionReference orders = FirebaseFirestore.instance.collection('orders');
+    CollectionReference userOrders = FirebaseFirestore.instance.collection('users').doc(userId).collection("orders");
 
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Payment'),
+          content: Column(
+            children: [
+              Text('Are you sure you want to confirm the payment for Order ID: $orderId?'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Update the first collection (orders)
+                await orders.doc(orderId).update({
+                  'status': 'normal',
+                  // Add any other fields you want to update
+                });
 
-  void navigateToOrderDetailScreen(Map<String, dynamic> orderData) {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => OrderDetailScreen(orderData: orderData),
-    //   ),
-    // );
+                // Update the second collection (userOrders)
+                await userOrders.doc(orderId).update({
+                  'status': 'normal',
+                  // Add any other fields you want to update in the second collection
+                });
+
+                Navigator.of(context).pop();
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -215,19 +210,30 @@ class _TotalOrderScreenState extends State<TotalOrderScreen> {
                           onTap: () {
                             viewOrderDetails(orderData);
                           },
-                          child: Text(' ${orderData['Order ID'] ?? 'N/A'}'), // Use null-aware operator
+                          child: Text(' ${orderData['Order ID'] ?? 'N/A'}'),
                         ),
                       ),
-                      DataCell(      Text(' ${orderData['Status'] ?? 'N/A'}')), // Use null-aware operator
-                      DataCell(      Text(' ${orderData['Total Amount'] ?? 'N/A'}')), // Use null-aware operator
-                      DataCell(      Text(' ${orderData['Reference Number'] ?? 'N/A'}')), // Use null-aware operator
+                      DataCell(Text(' ${orderData['Status'] ?? 'N/A'}')),
+                      DataCell(Text(' ${orderData['Total Amount'] ?? 'N/A'}')),
+                      DataCell(Text(' ${orderData['Reference Number'] ?? 'N/A'}')),
                       DataCell(
                         Row(
                           children: [
                             SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: () {
-                                navigateToOrderDetailScreen(orderData);
+                                confirmPayment(orderData['Order ID'], orderData['Order By']);
+
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.blue, // Set the button color to blue
+                              ),
+                              child: Text('Confirm Payment'),
+                            ),
+                            SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.green, // Set the button color to green
