@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cpton_food2go_admin_web/main_screen/total_order_screen.dart';
 import 'package:cpton_food2go_admin_web/main_screen/total_sellers_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int numberOfSellers = 0; // Initialize with zero or the default value
   int numberOfSellersApplicant = 0; // Initialize with zero or the default value
   int numberOfRiders = 0; // Initialize with zero or the default value
-  int numberOfRidersApplicant = 0; // Initialize with zero or the default value
+  int numberOfRidersApplicant = 0;// Initialize with zero or the default value
+  int numberOfOrders = 0;
 
   String formatCurrentLiveTime(DateTime time) {
     return DateFormat("hh:mm:ss a").format(time);
@@ -68,6 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
       numberOfSellers = querySnapshot.size;
     });
   }
+  Future<void> fetchNumberOfOrders() async {
+
+    CollectionReference users = FirebaseFirestore.instance.collection('orders');
+
+    QuerySnapshot querySnapshot = await users.where('status', isEqualTo: 'ToPay').get();
+
+    setState(() {
+      numberOfOrders = querySnapshot.size;
+    });
+  }
+
 
   Future<void> fetchNumberOfSellersApplicants() async {
     // Reference to Firestore collection 'sellers'
@@ -117,6 +130,9 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchNumberOfCustomers();
     fetchNumberOfRiders();
     fetchNumberOfSellers();
+    fetchNumberOfOrders();
+    fetchNumberOfRidersApplicant();
+    fetchNumberOfSellersApplicants();
 
     // Set up the timer for live time
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -148,6 +164,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void viewAllSellersApplicants() {
     // Implement the action for "View All Seller Applicants"
     // For example, navigate to a new screen or show a dialog
+  }
+  void viewAllOrders() {
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> TotalOrderScreen()));
+
   }
 
   @override
@@ -226,6 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildCard('Total Riders', numberOfRiders.toString(), 'View All Riders', viewAllRiders),
                 _buildCard('New Rider Applicant', numberOfRidersApplicant.toString(), 'View All Riders', viewAllRidersApplicants),
                 _buildCard('New Seller Applicant', numberOfSellersApplicant.toString(), 'View All Seller', viewAllSellersApplicants),
+                _buildCard('Orders', numberOfOrders.toString(), 'View Orders', viewAllOrders),
               ],
             ),
           ],
