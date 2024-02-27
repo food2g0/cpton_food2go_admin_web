@@ -9,14 +9,15 @@ void main() async {
   await Firebase.initializeApp(
     // Replace with actual values
     options: FirebaseOptions(
-        apiKey: "AIzaSyA2RfYmVcKB8pL9i0MKpLOKE1rfRxB32Po",
-        authDomain: "foodtogo-b2974.firebaseapp.com",
-        databaseURL: "https://foodtogo-b2974-default-rtdb.firebaseio.com",
-        projectId: "foodtogo-b2974",
-        storageBucket: "foodtogo-b2974.appspot.com",
-        messagingSenderId: "82585542874",
-        appId: "1:82585542874:web:6af81168a01948492cc5e3",
-        measurementId: "G-P1N4CXEMDB"
+        apiKey: "AIzaSyBmEiVpraYJvn8chtrCOq4Am5UKJai4FP0",
+        authDomain: "food2go-44539.firebaseapp.com",
+        projectId: "food2go-44539",
+        storageBucket: "food2go-44539.appspot.com",
+        messagingSenderId: "844894233705",
+        appId: "1:844894233705:web:49791749574c05b7a1eef8",
+        measurementId: "G-3LDENK5S0X",
+        databaseURL: "https://food2go-44539-default-rtdb.asia-southeast1.firebasedatabase.app"
+
     ),
   );
 

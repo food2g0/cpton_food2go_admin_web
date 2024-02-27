@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cpton_food2go_admin_web/main_screen/SellersApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/total_sellers_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -73,12 +74,12 @@ class _HomeScreenState extends State<HomeScreen> {
     // Reference to Firestore collection 'sellers'
     CollectionReference sellers = FirebaseFirestore.instance.collection('sellers');
 
-    // Get the documents with status 'approved' from the collection
+    // Get the documents with status 'disapproved' from the collection
     QuerySnapshot querySnapshot = await sellers.where('status', isEqualTo: 'disapproved').get();
 
-    // Get the number of documents (sellers) with status 'approved' in the collection
+    // Get the number of documents (sellers) with status 'disapproved' in the collection
     setState(() {
-      numberOfSellers = querySnapshot.size;
+      numberOfSellersApplicant = querySnapshot.size;
     });
   }
 
@@ -117,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchNumberOfCustomers();
     fetchNumberOfRiders();
     fetchNumberOfSellers();
+    fetchNumberOfSellersApplicants();
 
     // Set up the timer for live time
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -148,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void viewAllSellersApplicants() {
     // Implement the action for "View All Seller Applicants"
     // For example, navigate to a new screen or show a dialog
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> SellersApplicants()));
   }
 
   @override

@@ -38,11 +38,17 @@ class _SellerDetailScreenState extends State<SellerDetailScreen> {
       // Remove seller from the 'sellers' collection
       await FirebaseFirestore.instance.collection('sellers').doc(widget.sellerData['sellersUID']).delete();
 
-      // Remove products associated with the seller from the 'items' collection
+      // Get product IDs associated with the seller from the 'items' collection
       QuerySnapshot<Object?> productsSnapshot = await FirebaseFirestore.instance.collection('items').where('sellerUID', isEqualTo: widget.sellerData['sellersUID']).get();
 
+      List<String> productIds = [];
       for (QueryDocumentSnapshot<Object?> product in productsSnapshot.docs) {
-        await FirebaseFirestore.instance.collection('items').doc(product.id).delete();
+        productIds.add(product.id);
+      }
+
+      // Remove products associated with the seller from the 'items' collection
+      for (String productId in productIds) {
+        await FirebaseFirestore.instance.collection('items').doc(productId).delete();
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -63,6 +69,7 @@ class _SellerDetailScreenState extends State<SellerDetailScreen> {
       );
     }
   }
+
 
 
 
