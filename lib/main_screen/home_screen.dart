@@ -156,15 +156,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors().white1,
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: AppColors().red,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Admin Dashboard'),
+            Text('Admin Dashboard',
+            style: TextStyle(color: AppColors().white,
+            fontFamily: "Poppins",
+            fontWeight: FontWeight.w500),),
             Text(
               '$timeText $dateText',
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14,
+              fontFamily: "Poppins",
+              color: AppColors().black),
             ),
           ],
         ),
@@ -175,39 +181,40 @@ class _HomeScreenState extends State<HomeScreen> {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: AppColors().red,
               ),
-              child: Text(
+              child: const Text(
                 'Admin Menu',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
+                  fontFamily: "Poppins"
                 ),
               ),
             ),
             ListTile(
-              title: Text('Dashboard'),
+              title: const Text('Dashboard'),
               onTap: () {
                 // Handle dashboard tap
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text('Users'),
+              title: const Text('Users'),
               onTap: () {
                 // Handle users tap
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text('Products'),
+              title: const Text('Products'),
               onTap: () {
                 // Handle products tap
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text('Settings'),
+              title: const Text('Settings'),
               onTap: () {
                 // Handle settings tap
                 Navigator.pop(context);
@@ -239,38 +246,79 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCard(String title, String count, String viewAllLabel, void Function() onPressed) {
     return Container(
-      height: 150,
-      width: 250,
-      color: AppColors().black1,
+      height: 170,
+      width: 270,
+      decoration: BoxDecoration(
+        color: AppColors().white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.grey, // You can set the border color here
+          width: 1, // You can adjust the border width here
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
-              title,
-              style: TextStyle(fontSize: 18,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style:  TextStyle(
+                    fontSize: 18,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    color: AppColors().black,
+                  ),
+                ),
+               const SizedBox(width: 20,),
+                Icon(
+                  Icons.info_outline, // You can change the icon here
+                  color: AppColors().black, // You can change the icon color here
+                ),
+              ],
             ),
-            SizedBox(height: 10),
+           const SizedBox(height: 10),
             Text(
               count,
-              style: TextStyle(fontSize: 24,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w500),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: onPressed,
-              child: Text(
-                viewAllLabel,
-                style: TextStyle(fontSize: 12, color: AppColors().red),
+              style: TextStyle(
+                fontSize: 24,
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.w500,
+                color: AppColors().black,
               ),
             ),
+            const SizedBox(height: 30),
+            ElevatedButton.icon(
+              onPressed: onPressed,
+              icon: Icon(
+                Icons.remove_red_eye, // Replace this with the icon you want
+                size: 18, // Adjust the icon size as needed
+                color: AppColors().white, // Set the icon color
+              ),
+              label: Text(
+                viewAllLabel,
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 12,
+                  color: AppColors().white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors().black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
           ],
         ),
       ),
     );
+
+
   }
 }
 

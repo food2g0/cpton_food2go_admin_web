@@ -1,4 +1,5 @@
 import 'package:cpton_food2go_admin_web/main_screen/seller_details_screen.dart';
+import 'package:cpton_food2go_admin_web/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -36,14 +37,14 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
         'sellerPhoto': doc['sellersImageUrl'],
         'sellerEarnings': doc['earnings'],
         'sellersphone': doc['sellersphone'],
-
         'status': doc['status'],
       };
     }).toList();
   }
 
-  Future<void> updateSellerStatus(String sellerUID, bool block) async {
+  Future<void> updateSellerStatus(String sellersUID, bool block) async {
     CollectionReference sellers = FirebaseFirestore.instance.collection('sellers');
+    CollectionReference items = FirebaseFirestore.instance.collection('items');
 
     if (block) {
       await showDialog(
@@ -69,9 +70,15 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
               ),
               TextButton(
                 onPressed: () async {
-                  await sellers.doc(sellerUID).update({
+                  await sellers.doc(sellersUID).update({
                     'status': 'disapproved',
                     'blockingReason': blockingReasonController.text,
+                  });
+
+                  await items.where('sellersUID', isEqualTo: sellersUID).get().then((querySnapshot) {
+                    querySnapshot.docs.forEach((doc) {
+                      doc.reference.update({'status': 'disapproved'});
+                    });
                   });
 
                   blockingReasonController.clear();
@@ -84,7 +91,13 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
         },
       );
     } else {
-      await sellers.doc(sellerUID).update({'status': 'approved'});
+      await sellers.doc(sellersUID).update({'status': 'approved'});
+
+      await items.where('sellersUID', isEqualTo: sellersUID).get().then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.update({'status': 'available'});
+        });
+      });
     }
   }
 
@@ -139,8 +152,12 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors().white,
       appBar: AppBar(
-        title: Text('Total Sellers'),
+        backgroundColor: AppColors().red,
+        title: Text('Total Sellers',
+        style: TextStyle(color: AppColors().white,
+        fontFamily: "Poppins"),),
         actions: [
           IconButton(
             icon: Icon(Icons.search),
@@ -218,31 +235,69 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
                         ),
                       ),
                       DataCell(Text(sellerData['sellersUID'])),
-                      DataCell(Text(sellerData['status'])),
+                      DataCell(
+                        Text(
+                          sellerData['status'],
+                          style: TextStyle(
+                            color: sellerData['status'] == 'approved' ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      ),
+
                       DataCell(
                         Row(
                           children: [
-                            ElevatedButton(
+                            ElevatedButton.icon(
                               onPressed: () {
                                 updateSellerStatus(sellerData['sellersUID'], !isBlocked);
                                 setState(() {
                                   sellerData['status'] = !isBlocked ? 'disapproved' : 'approved';
                                 });
                               },
-                              child: Text(!isBlocked ? 'Block Seller' : 'Unblock Seller'),
+                              style: ElevatedButton.styleFrom(
+                                primary: !isBlocked ? Colors.red : Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              icon: Icon(
+                                !isBlocked ? Icons.block : Icons.check_circle,
+                                color: AppColors().white,
+                              ),
+                              label: Text(
+                                !isBlocked ? 'Block' : 'Unblock',
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  color: AppColors().white,
+                                ),
+                              ),
                             ),
                             SizedBox(width: 8),
-                            ElevatedButton(
+                            ElevatedButton.icon(
                               onPressed: () {
                                 navigateToSellerDetailScreen(sellerData);
                               },
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.green, // Set the button color to green
+                                primary: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                              child: Text('View Details'),
+                              icon: Icon(
+                                Icons.visibility,
+                                color: AppColors().white,
+                              ),
+                              label: Text(
+                                'View',
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  color: AppColors().white,
+                                ),
+                              ),
                             ),
                           ],
                         ),
+
                       ),
                     ],
                   );
@@ -255,5 +310,3 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
     );
   }
 }
-
-

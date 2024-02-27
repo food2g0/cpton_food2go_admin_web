@@ -15,9 +15,13 @@ class _SellersApplicantsState extends State<SellersApplicants> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors().red,
-        title: Text('Sellers Applicant',
-        style: TextStyle(color: AppColors().white,
-        fontFamily: "Poppins"),),
+        title: Text(
+          'Sellers Applicant',
+          style: TextStyle(
+            color: AppColors().white,
+            fontFamily: "Poppins",
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -40,18 +44,125 @@ class _SellersApplicantsState extends State<SellersApplicants> {
               child: Text('No Sellers Applicant found.'),
             );
           }
-          return ListView(
-            children: snapshot.data!.docs.map((doc) {
-              // Assuming your seller document has a field named 'name'
-              final sellersName = doc['sellersName'];
-              return ListTile(
-                title: Text(sellersName),
-                // Add more ListTile properties or widgets as needed
-              );
-            }).toList(),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: [
+                      DataColumn(label: Text('Name')),
+                      DataColumn(label: Text('Email')),
+                      DataColumn(label: Text('Address')),
+                      DataColumn(label: Text('Actions')),
+                    ],
+                    rows: snapshot.data!.docs.map((doc) {
+                      final sellersName = doc['sellersName'];
+                      final sellersEmail = doc['sellersEmail'];
+                      final sellersAddress = doc['sellersAddress'];
+                      return DataRow(cells: [
+                        DataCell(Text(sellersName)),
+                        DataCell(Text(sellersEmail)),
+                        DataCell(Text(sellersAddress)),
+                        DataCell(Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Implement view button action
+                                _viewSeller(doc['sellersUID'], context);
+                              },
+                              child: Text('View'),
+                            ),
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Implement approve button action
+                                _approveSeller(doc.id);
+                              },
+                              child: Text('Approve'),
+                            ),
+                          ],
+                        )),
+                      ]);
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
     );
   }
+
+  Future<void> _approveSeller(String docId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('sellers')
+          .doc(docId)
+          .update({'status': 'approved'});
+      // Optionally, you can show a success message or perform other actions after updating the status.
+    } catch (error) {
+      // Handle errors here
+      print('Error approving seller: $error');
+    }
+  }
 }
+Future<void> _viewSeller(String sellersUID, BuildContext context) async {
+  try {
+    DocumentSnapshot sellerDoc = await FirebaseFirestore.instance
+        .collection('sellersDocs')
+        .doc(sellersUID)
+        .get();
+
+    if (sellerDoc.exists) {
+      // Check if the document exists
+      var data = sellerDoc.data();
+      if (data != null && data is Map<String, dynamic>) {
+        // Check if the document has data and cast data to Map<String, dynamic>
+        if (data.containsKey('documentUrl')) {
+          // If documentUrl field exists, it's an image
+          String documentUrl = data['documentUrl'];
+          // Display the image using Image.network
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Image.network(documentUrl),
+            ),
+          );
+        } else if (data.containsKey('fileName')) {
+          // If fileName field exists, it's a file
+          String fileName = data['fileName'];
+          // Display the file name using Text
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text(fileName),
+            ),
+          );
+        } else {
+          // Handle other types of documents or display an error message
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text('Unknown document type'),
+            ),
+          );
+        }
+      }
+    } else {
+      // Handle the case where the document does not exist
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: Text('Seller document not found'),
+        ),
+      );
+    }
+  } catch (error) {
+    // Handle errors here
+    print('Error viewing seller: $error');
+  }
+}
+
