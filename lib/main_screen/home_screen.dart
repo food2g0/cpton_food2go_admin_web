@@ -18,11 +18,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String timeText = "";
   String dateText = "";
-  int numberOfCustomers = 0; // Initialize with zero or the default value
-  int numberOfSellers = 0; // Initialize with zero or the default value
-  int numberOfSellersApplicant = 0; // Initialize with zero or the default value
-  int numberOfRiders = 0; // Initialize with zero or the default value
-  int numberOfRidersApplicant = 0; // Initialize with zero or the default value
+  int numberOfCustomers = 0;
+  int numberOfSellers = 0;
+  int numberOfSellersApplicant = 0;
+  int numberOfRiders = 0;
+  int numberOfRidersApplicant = 0;
 
   String formatCurrentLiveTime(DateTime time) {
     return DateFormat("hh:mm:ss a").format(time);
@@ -45,112 +45,76 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Set up the timer for live time
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      getCurrentLiveTime();
+    });
+    // Fetch the initial numbers
+    fetchNumbers();
+  }
+
+  void fetchNumbers() {
+    fetchNumberOfCustomers();
+    fetchNumberOfRiders();
+    fetchNumberOfSellers();
+    fetchNumberOfSellersApplicants();
+    fetchNumberOfRidersApplicants();
+  }
+
   Future<void> fetchNumberOfCustomers() async {
-    // Reference to Firestore collection 'users'
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-
-    // Get the documents from the collection
     QuerySnapshot querySnapshot = await users.get();
-
     setState(() {
       numberOfCustomers = querySnapshot.size;
     });
   }
 
   Future<void> fetchNumberOfSellers() async {
-    // Reference to Firestore collection 'sellers'
     CollectionReference sellers = FirebaseFirestore.instance.collection('sellers');
-
-    // Get the documents with status 'approved' from the collection
     QuerySnapshot querySnapshot = await sellers.where('status', isEqualTo: 'approved').get();
-
-    // Get the number of documents (sellers) with status 'approved' in the collection
     setState(() {
       numberOfSellers = querySnapshot.size;
     });
   }
 
   Future<void> fetchNumberOfSellersApplicants() async {
-    // Reference to Firestore collection 'sellers'
     CollectionReference sellers = FirebaseFirestore.instance.collection('sellers');
-
-    // Get the documents with status 'disapproved' from the collection
     QuerySnapshot querySnapshot = await sellers.where('status', isEqualTo: 'disapproved').get();
-
-    // Get the number of documents (sellers) with status 'disapproved' in the collection
     setState(() {
       numberOfSellersApplicant = querySnapshot.size;
     });
   }
 
-
   Future<void> fetchNumberOfRiders() async {
-    // Reference to Firestore collection 'users'
     CollectionReference users = FirebaseFirestore.instance.collection('riders');
-
-    // Get the documents from the collection
     QuerySnapshot querySnapshot = await users.get();
-
-    // Get the number of documents (customers) in the collection
     setState(() {
       numberOfRiders = querySnapshot.size;
     });
   }
 
-  Future<void> fetchNumberOfRidersApplicant() async {
-    // Reference to Firestore collection 'users'
+  Future<void> fetchNumberOfRidersApplicants() async {
     CollectionReference riders = FirebaseFirestore.instance.collection('riders');
-
     QuerySnapshot querySnapshot = await riders.where('status', isEqualTo: 'disapproved').get();
-
-
-    // Get the number of documents (customers) in the collection
     setState(() {
       numberOfRidersApplicant = querySnapshot.size;
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Fetch the initial number of customers
-    fetchNumberOfCustomers();
-    fetchNumberOfRiders();
-    fetchNumberOfSellers();
-    fetchNumberOfSellersApplicants();
-
-    // Set up the timer for live time
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      getCurrentLiveTime();
-    });
-  }
-
-  // ... (Previous code remains unchanged)
   void viewAllCustomers() {
     // Implement the action for "View All Customers"
     // For example, navigate to a new screen or show a dialog
   }
 
   void viewAllSellers() {
-    // Implement the action for "View All Sellers"
-   Navigator.push(context, MaterialPageRoute(builder: (c)=> TotalSellerScreen()));
-  }
-
-  void viewAllRiders() {
-    // Implement the action for "View All Riders"
-    // For example, navigate to a new screen or show a dialog
-  }
-
-  void viewAllRidersApplicants() {
-    // Implement the action for "View All Rider Applicants"
-    // For example, navigate to a new screen or show a dialog
+    Navigator.push(context, MaterialPageRoute(builder: (c) => TotalSellerScreen()));
   }
 
   void viewAllSellersApplicants() {
-    // Implement the action for "View All Seller Applicants"
-    // For example, navigate to a new screen or show a dialog
-    Navigator.push(context, MaterialPageRoute(builder: (c)=> SellersApplicants()));
+    Navigator.push(context, MaterialPageRoute(builder: (c) => SellersApplicants()));
   }
 
   @override
@@ -162,15 +126,17 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Admin Dashboard',
-            style: TextStyle(color: AppColors().white,
-            fontFamily: "Poppins",
-            fontWeight: FontWeight.w500),),
+            Text(
+              'Admin Dashboard',
+              style: TextStyle(
+                color: AppColors().white,
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             Text(
               '$timeText $dateText',
-              style: TextStyle(fontSize: 14,
-              fontFamily: "Poppins",
-              color: AppColors().black),
+              style: TextStyle(fontSize: 14, fontFamily: "Poppins", color: AppColors().black),
             ),
           ],
         ),
@@ -188,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
-                  fontFamily: "Poppins"
+                  fontFamily: "Poppins",
                 ),
               ),
             ),
@@ -233,9 +199,9 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _buildCard('Total Customers', numberOfCustomers.toString(), 'View All Customers', viewAllCustomers),
                 _buildCard('Total Sellers', numberOfSellers.toString(), 'View All Sellers', viewAllSellers),
-                _buildCard('Total Riders', numberOfRiders.toString(), 'View All Riders', viewAllRiders),
-                _buildCard('New Rider Applicant', numberOfRidersApplicant.toString(), 'View All Riders', viewAllRidersApplicants),
-                _buildCard('New Seller Applicant', numberOfSellersApplicant.toString(), 'View All Seller', viewAllSellersApplicants),
+                _buildCard('Total Riders', numberOfRiders.toString(), 'View All Riders', () {}),
+                _buildCard('New Rider Applicant', numberOfRidersApplicant.toString(), 'View All Riders', () {}),
+                _buildCard('New Seller Applicant', numberOfSellersApplicant.toString(), 'View All Seller Applicants', viewAllSellersApplicants),
               ],
             ),
           ],
@@ -265,21 +231,21 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   title,
-                  style:  TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontFamily: "Poppins",
                     fontWeight: FontWeight.bold,
                     color: AppColors().black,
                   ),
                 ),
-               const SizedBox(width: 20,),
+                const SizedBox(width: 20,),
                 Icon(
                   Icons.info_outline, // You can change the icon here
                   color: AppColors().black, // You can change the icon color here
                 ),
               ],
             ),
-           const SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               count,
               style: TextStyle(
@@ -297,14 +263,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 size: 18, // Adjust the icon size as needed
                 color: AppColors().white, // Set the icon color
               ),
-              label: Text(
-                viewAllLabel,
-                style: TextStyle(
-                  fontFamily: "Poppins",
-                  fontSize: 12,
-                  color: AppColors().white,
-                ),
-              ),
+              label: Text('View',
+              style: TextStyle(color: AppColors().white,
+              fontFamily: "Poppins"),),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors().black,
                 shape: RoundedRectangleBorder(
@@ -312,13 +273,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
-
-
   }
 }
-

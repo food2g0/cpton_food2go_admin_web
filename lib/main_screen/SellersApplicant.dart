@@ -72,7 +72,17 @@ class _SellersApplicantsState extends State<SellersApplicants> {
                                 // Implement view button action
                                 _viewSeller(doc['sellersUID'], context);
                               },
-                              child: Text('View'),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors().yellow,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  )
+                              ),
+                              child: Text('View',
+                                style: TextStyle(
+                                    color: AppColors().white,
+                                    fontFamily: "Poppins"
+                                ),),
                             ),
                             SizedBox(width: 10),
                             ElevatedButton(
@@ -80,7 +90,17 @@ class _SellersApplicantsState extends State<SellersApplicants> {
                                 // Implement approve button action
                                 _approveSeller(doc.id);
                               },
-                              child: Text('Approve'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors().green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)
+                                )
+                              ),
+                              child: Text('Approve',
+                              style: TextStyle(
+                                color: AppColors().white,
+                                fontFamily: "Poppins"
+                              ),),
                             ),
                           ],
                         )),
@@ -124,8 +144,7 @@ Future<void> _viewSeller(String sellersUID, BuildContext context) async {
         if (data.containsKey('documentUrl')) {
           // If documentUrl field exists, it's an image
           String documentUrl = data['documentUrl'];
-          // Display the image using Image.network
-          showDialog(
+           showDialog(
             context: context,
             builder: (context) => AlertDialog(
               content: Image.network(documentUrl),
