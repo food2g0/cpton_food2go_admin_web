@@ -33,13 +33,74 @@ class _SellerDetailScreenState extends State<SellerDetailScreen> {
   //     );
   //   }
   // }
+  // Future<void> getSellerEarnings() async {
+  //   try {
+  //     // Fetch the sales document for the specific month (e.g., '02_February')
+  //     DocumentSnapshot salesSnapshot = await FirebaseFirestore.instance
+  //         .collection('sales')
+  //         .doc('02_February') // Replace '02_February' with the desired month
+  //         .get();
+  //
+  //     // Check if the document exists
+  //     if (salesSnapshot.exists) {
+  //       // Get the earnings for the specific seller from the sales document
+  //       var saleData = salesSnapshot.data();
+  //       if (saleData != null) {
+  //         var sellerUID = widget.sellerData['sellersUID'];
+  //         var saleVal = saleData[sellerUID];
+  //
+  //         if (saleVal != null) {
+  //           // Update the 'sellerEarnings' field in the UI
+  //           setState(() {
+  //             widget.sellerData['sellerEarnings'] = saleVal;
+  //           });
+  //         } else {
+  //           // If saleVal is null, handle it accordingly
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //               content: Text('Seller earnings data not found'),
+  //               duration: Duration(seconds: 2),
+  //             ),
+  //           );
+  //         }
+  //       } else {
+  //         // Handle the case where sales data is null
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('No sales data found for this month'),
+  //             duration: Duration(seconds: 2),
+  //           ),
+  //         );
+  //       }
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('No sales data found for this month'),
+  //           duration: Duration(seconds: 2),
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Error fetching seller earnings: $e'),
+  //         duration: Duration(seconds: 2),
+  //       ),
+  //     );
+  //   }
+  // }
+
+
+
+
   Future<void> removeSellerItem() async {
     try {
       // Remove seller from the 'sellers' collection
       await FirebaseFirestore.instance.collection('sellers').doc(widget.sellerData['sellersUID']).delete();
 
       // Get product IDs associated with the seller from the 'items' collection
-      QuerySnapshot<Object?> productsSnapshot = await FirebaseFirestore.instance.collection('items').where('sellerUID', isEqualTo: widget.sellerData['sellersUID']).get();
+      QuerySnapshot<Object?> productsSnapshot = await FirebaseFirestore.instance.collection('items').where('sellerUID',
+          isEqualTo: widget.sellerData['sellersUID']).get();
 
       List<String> productIds = [];
       for (QueryDocumentSnapshot<Object?> product in productsSnapshot.docs) {
@@ -139,7 +200,7 @@ class _SellerDetailScreenState extends State<SellerDetailScreen> {
                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      '\$${widget.sellerData['sellerEarnings']}',
+                      '\P: ${widget.sellerData['sellerEarnings']}',
                       style: TextStyle(fontSize: 16.0, color: Colors.green),
                     ),
                     SizedBox(height: 20.0),

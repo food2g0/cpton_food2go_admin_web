@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:cpton_food2go_admin_web/main_screen/RiderApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/SellersApplicant.dart';
+import 'package:cpton_food2go_admin_web/main_screen/total_riders.dart';
 import 'package:cpton_food2go_admin_web/main_screen/total_sellers_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -108,6 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // Implement the action for "View All Customers"
     // For example, navigate to a new screen or show a dialog
   }
+  void viewAllRiders() {
+    Navigator.push(context, MaterialPageRoute(builder: (c) => TotalRidersScreen()));
+  }
 
   void viewAllSellers() {
     Navigator.push(context, MaterialPageRoute(builder: (c) => TotalSellerScreen()));
@@ -115,6 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void viewAllSellersApplicants() {
     Navigator.push(context, MaterialPageRoute(builder: (c) => SellersApplicants()));
+  }
+  void viewAllRidersApplicants() {
+    Navigator.push(context, MaterialPageRoute(builder: (c) => RidersApplicants()));
   }
 
   @override
@@ -199,8 +207,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _buildCard('Total Customers', numberOfCustomers.toString(), 'View All Customers', viewAllCustomers),
                 _buildCard('Total Sellers', numberOfSellers.toString(), 'View All Sellers', viewAllSellers),
-                _buildCard('Total Riders', numberOfRiders.toString(), 'View All Riders', () {}),
-                _buildCard('New Rider Applicant', numberOfRidersApplicant.toString(), 'View All Riders', () {}),
+                _buildCard('Total Riders', numberOfRiders.toString(), 'View All Riders', viewAllRiders),
+                _buildCard('New Rider Applicant', numberOfRidersApplicant.toString(), 'View All Riders', viewAllRidersApplicants),
                 _buildCard('New Seller Applicant', numberOfSellersApplicant.toString(), 'View All Seller Applicants', viewAllSellersApplicants),
               ],
             ),
