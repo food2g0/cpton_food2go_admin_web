@@ -541,7 +541,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void disapproveOrder(String orderId, String orderBy) {
-
     String reason = '';
     TextEditingController reasonController = TextEditingController();
     showDialog(
@@ -556,41 +555,41 @@ class _HomeScreenState extends State<HomeScreen> {
               reason = value;
             },
           ),
-
           actions: <Widget>[
-
             ElevatedButton(
               onPressed: () async {
-
                 try {
                   // Update the order status
                   await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
                     'status': 'cancel', // Assuming the field for status is 'status'
+                    'disapprovalReason': reason, // Save reason in the 'orders' collection
                   });
 
-                  // Update the user's document
+                  // Update the user's document in the 'users' collection
                   await FirebaseFirestore.instance.collection('users').doc(orderBy).collection('orders').doc(orderId).update({
                     'status': 'cancel', // Assuming the field for status is 'status'
+                    'disapprovalReason': reason, // Save reason in the 'users' collection
                   });
 
                 } catch (e) {
-                  print('Error approving order: $e');
+                  print('Error disapproving order: $e');
                   // Handle error
                 }
-
+                // Close the dialog
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 primary: AppColors().red,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              child: const Text(
-                  'Submit', style: TextStyle(color: Colors.white)),
+              child: const Text('Submit', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
       },
     );
   }
+
 
   Widget _buildCard(String title, String count, String viewAllLabel, void Function() onPressed) {
     return Container(
