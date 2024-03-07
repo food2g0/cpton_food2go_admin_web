@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cpton_food2go_admin_web/assistant/assisstant_method.dart';
 import 'package:cpton_food2go_admin_web/main_screen/RiderApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/SellersApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/total_riders.dart';
@@ -487,6 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ElevatedButton(
                         onPressed: () async {
                           try {
+                            sendNotificationToUserNowOrderApproved(orderId, orderBy);
                             // Update the order status
                             await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
                               'status': 'normal', // Assuming the field for status is 'status'
@@ -517,6 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           // Implement disapprove action
                           disapproveOrder(orderId, orderBy);
+
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors().red,
@@ -559,6 +562,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
+
+                  sendNotificationToUserNow(orderId, orderBy);
                   // Update the order status
                   await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
                     'status': 'cancel', // Assuming the field for status is 'status'
@@ -589,7 +594,64 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+  void sendNotificationToUserNow(String orderId, String orderBy) {
+    FirebaseFirestore.instance.collection("users").doc(orderBy).get().then((DocumentSnapshot snap) {
+      if (snap.exists) {
+        Map<String, dynamic>? userData = snap.data() as Map<String, dynamic>?;
 
+        if (userData != null && userData.containsKey('registrationToken')) {
+          String registrationToken = userData['registrationToken'] as String;
+
+          //send notification
+          AssistantMethods.sendNotificationToUserNow(registrationToken, orderId,);
+
+
+          if (registrationToken.isNotEmpty) {
+            // Send notification using the registrationToken
+            print('Registration token found: $registrationToken');
+            // Call your notification sending function here with the registrationToken
+          } else {
+            print('Registration token not found or empty.');
+          }
+        } else {
+          print('Registration token not found in user data.');
+        }
+      } else {
+        print('User document not found for order by: $orderBy');
+      }
+    }).catchError((error) {
+      print("Error retrieving user document: $error");
+    });
+  }
+  void sendNotificationToUserNowOrderApproved(String orderId, String orderBy) {
+    FirebaseFirestore.instance.collection("users").doc(orderBy).get().then((DocumentSnapshot snap) {
+      if (snap.exists) {
+        Map<String, dynamic>? userData = snap.data() as Map<String, dynamic>?;
+
+        if (userData != null && userData.containsKey('registrationToken')) {
+          String registrationToken = userData['registrationToken'] as String;
+
+          //send notification
+          AssistantMethods.sendNotificationToUserNowOrderApproved(registrationToken, orderId,);
+
+
+          if (registrationToken.isNotEmpty) {
+            // Send notification using the registrationToken
+            print('Registration token found: $registrationToken');
+            // Call your notification sending function here with the registrationToken
+          } else {
+            print('Registration token not found or empty.');
+          }
+        } else {
+          print('Registration token not found in user data.');
+        }
+      } else {
+        print('User document not found for order by: $orderBy');
+      }
+    }).catchError((error) {
+      print("Error retrieving user document: $error");
+    });
+  }
 
   Widget _buildCard(String title, String count, String viewAllLabel, void Function() onPressed) {
     return Container(
