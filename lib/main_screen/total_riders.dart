@@ -3,6 +3,7 @@ import 'package:cpton_food2go_admin_web/main_screen/seller_details_screen.dart';
 import 'package:cpton_food2go_admin_web/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 
 class TotalRidersScreen extends StatefulWidget {
   const TotalRidersScreen({Key? key}) : super(key: key);
@@ -25,12 +26,33 @@ class _TotalRidersScreenState extends State<TotalRidersScreen> {
   }
 
   Future<List<Map<String, dynamic>>> fetchRiderData() async {
-    CollectionReference sellers = FirebaseFirestore.instance.collection('riders');
+    CollectionReference riders = FirebaseFirestore.instance.collection('riders');
 
-    QuerySnapshot<Object?> querySnapshot = await sellers.get();
+    QuerySnapshot<Object?> querySnapshot = await riders.get();
 
-    return querySnapshot.docs.map((DocumentSnapshot<Object?> doc) {
-      return {
+    List<Map<String, dynamic>> riderDataList = [];
+
+    for (DocumentSnapshot<Object?> doc in querySnapshot.docs) {
+      // Fetch all records for the current rider from the ridersRecord collection
+      QuerySnapshot<Object?> recordsSnapshot = await riders.doc(doc.id).collection('ridersRecord').get();
+
+      // Calculate average rating
+      double averageRating = 0;
+      int totalRatings = 0;
+      double sumRatings = 0;
+
+      // Iterate over the records to sum up ratings
+      recordsSnapshot.docs.forEach((ratingDoc) {
+        totalRatings++;
+        sumRatings += (ratingDoc['rating'] as num).toDouble();
+      });
+
+      // Avoid division by zero
+      if (totalRatings > 0) {
+        averageRating = sumRatings / totalRatings;
+      }
+
+      Map<String, dynamic> riderData = {
         'riderName': doc['riderName'],
         'riderUID': doc['riderUID'],
         'riderEmail': doc['riderEmail'],
@@ -39,9 +61,15 @@ class _TotalRidersScreenState extends State<TotalRidersScreen> {
         'earnings': doc['earnings'],
         'phone': doc['phone'],
         'status': doc['status'],
+        'averageRating': averageRating,
       };
-    }).toList();
+
+      riderDataList.add(riderData);
+    }
+
+    return riderDataList;
   }
+
 
   Future<void> updateSellerStatus(String riderUID, bool block) async {
     CollectionReference riders = FirebaseFirestore.instance.collection('riders');
@@ -207,6 +235,7 @@ class _TotalRidersScreenState extends State<TotalRidersScreen> {
                   DataColumn(label: Text('Rider Name')),
                   DataColumn(label: Text('Rider UID')),
                   DataColumn(label: Text('Status')),
+                  DataColumn(label: Text('Average Rating')),
                   DataColumn(label: Text('Actions')),
                 ],
                 rows: snapshot.data!.map<DataRow>((riderData) {
@@ -228,6 +257,21 @@ class _TotalRidersScreenState extends State<TotalRidersScreen> {
                           style: TextStyle(
                             color: riderData['status'] == 'approved' ? Colors.green : Colors.red,
                           ),
+                        ),
+                      ),
+
+                      DataCell(
+                        SmoothStarRating(
+                          rating: riderData['averageRating'],
+                          size: 16, // Set the size of the stars
+                          filledIconData: Icons.star, // Icon to display for filled stars
+                          halfFilledIconData: Icons.star_half, // Icon to display for half-filled stars
+                          defaultIconData: Icons.star_border, // Icon to display for empty stars
+                          color: Colors.yellow, // Set the color of the stars
+                          borderColor: AppColors().black, // Set the border color of the stars
+                          starCount: 5, // Set the total number of stars
+                          allowHalfRating: true, // Allow half ratings
+                          spacing: 2.0, // Set spacing between stars
                         ),
                       ),
 

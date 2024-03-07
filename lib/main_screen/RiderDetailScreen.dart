@@ -16,7 +16,8 @@ class _RiderDetailScreenState extends State<RiderDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final earnings = widget.riderData['earnings'];
-    final earningsDouble = earnings != null ? double.parse(earnings) : 0.0;
+    final earningsDouble = earnings != null ? double.parse(earnings.toString()) : 0.0;
+
     final result = earningsDouble * 0.7;
     final resultString = '\P: $result';
 

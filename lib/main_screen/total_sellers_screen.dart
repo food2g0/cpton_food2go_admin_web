@@ -2,6 +2,7 @@ import 'package:cpton_food2go_admin_web/main_screen/seller_details_screen.dart';
 import 'package:cpton_food2go_admin_web/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 
 class TotalSellerScreen extends StatefulWidget {
   const TotalSellerScreen({Key? key}) : super(key: key);
@@ -28,8 +29,29 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
 
     QuerySnapshot<Object?> querySnapshot = await sellers.get();
 
-    return querySnapshot.docs.map((DocumentSnapshot<Object?> doc) {
-      return {
+    List<Map<String, dynamic>> sellerDataList = [];
+
+    for (DocumentSnapshot<Object?> doc in querySnapshot.docs) {
+      // Fetch all records for the current rider from the ridersRecord collection
+      QuerySnapshot<Object?> recordsSnapshot = await sellers.doc(doc.id).collection('sellersRecord').get();
+
+      // Calculate average rating
+      double averageRating = 0;
+      int totalRatings = 0;
+      double sumRatings = 0;
+
+      // Iterate over the records to sum up ratings
+      recordsSnapshot.docs.forEach((ratingDoc) {
+        totalRatings++;
+        sumRatings += (ratingDoc['rating'] as num).toDouble();
+      });
+
+      // Avoid division by zero
+      if (totalRatings > 0) {
+        averageRating = sumRatings / totalRatings;
+      }
+
+      Map<String, dynamic> sellerData = {
         'sellersName': doc['sellersName'],
         'sellersUID': doc['sellersUID'],
         'sellersEmail': doc['sellersEmail'],
@@ -38,8 +60,13 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
         'sellerEarnings': doc['earnings'],
         'sellersphone': doc['sellersphone'],
         'status': doc['status'],
+        'averageRating': averageRating,
       };
-    }).toList();
+
+      sellerDataList.add(sellerData);
+    }
+
+    return sellerDataList;
   }
 
   Future<void> updateSellerStatus(String sellersUID, bool block) async {
@@ -220,6 +247,7 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
                   DataColumn(label: Text('Seller Name')),
                   DataColumn(label: Text('Seller UID')),
                   DataColumn(label: Text('Status')),
+                  DataColumn(label: Text('Average Rating')),
                   DataColumn(label: Text('Actions')),
                 ],
                 rows: snapshot.data!.map<DataRow>((sellerData) {
@@ -241,6 +269,20 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
                           style: TextStyle(
                             color: sellerData['status'] == 'approved' ? Colors.green : Colors.red,
                           ),
+                        ),
+                      ),
+                      DataCell(
+                        SmoothStarRating(
+                          rating: sellerData['averageRating'],
+                          size: 16, // Set the size of the stars
+                          filledIconData: Icons.star, // Icon to display for filled stars
+                          halfFilledIconData: Icons.star_half, // Icon to display for half-filled stars
+                          defaultIconData: Icons.star_border, // Icon to display for empty stars
+                          color: Colors.yellow, // Set the color of the stars
+                          borderColor: AppColors().black, // Set the border color of the stars
+                          starCount: 5, // Set the total number of stars
+                          allowHalfRating: true, // Allow half ratings
+                          spacing: 2.0, // Set spacing between stars
                         ),
                       ),
 

@@ -56,7 +56,7 @@ class _BigContainerState extends State<BigContainer> {
           List<DocumentSnapshot> orders = snapshot.data!.docs;
           return SingleChildScrollView(
             child: SizedBox(
-              height: 500, // Same as the container's height
+              height: 600, // Same as the container's height
               child: Column(
                 children: [
                   // _buildDataTableHeader(), // Create DataTable header
