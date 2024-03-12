@@ -1,6 +1,8 @@
 import 'package:cpton_food2go_admin_web/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../assistant/assisstant_method.dart';
 
 class SellersApplicants extends StatefulWidget {
   const SellersApplicants({Key? key}) : super(key: key);
@@ -61,6 +63,7 @@ class _SellersApplicantsState extends State<SellersApplicants> {
                       final sellersName = doc['sellersName'];
                       final sellersEmail = doc['sellersEmail'];
                       final sellersAddress = doc['sellersAddress'];
+                      final sellersRegistration = doc['sellersAddress'];
                       return DataRow(cells: [
                         DataCell(Text(sellersName)),
                         DataCell(Text(sellersEmail)),
@@ -89,6 +92,8 @@ class _SellersApplicantsState extends State<SellersApplicants> {
                               onPressed: () {
                                 // Implement approve button action
                                 _approveSeller(doc.id);
+                                sendNotificationToSellerNowApproved(doc.id, sellersRegistration);
+
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors().green,
@@ -140,32 +145,40 @@ Future<void> _viewSeller(String sellersUID, BuildContext context) async {
       // Check if the document exists
       var data = sellerDoc.data();
       if (data != null && data is Map<String, dynamic>) {
-        // Check if the document has data and cast data to Map<String, dynamic>
         if (data.containsKey('documentUrl')) {
           // If documentUrl field exists, it's an image
           String documentUrl = data['documentUrl'];
-           showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              content: Image.network(documentUrl),
-            ),
-          );
-        } else if (data.containsKey('fileName')) {
-          // If fileName field exists, it's a file
-          String fileName = data['fileName'];
-          // Display the file name using Text
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              content: Text(fileName),
+              title: Text('Document'),
+              content: Text('Do you want to view this document?'),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    if (await canLaunch(documentUrl)) {
+                      await launch(documentUrl);
+                    } else {
+                      throw 'Could not launch $documentUrl';
+                    }
+                  },
+                  child: Text('View'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel'),
+                ),
+              ],
             ),
           );
         } else {
-          // Handle other types of documents or display an error message
+          // Handle the case where documentUrl field is not present
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              content: Text('Unknown document type'),
+              content: Text('Document URL not found'),
             ),
           );
         }
@@ -182,6 +195,43 @@ Future<void> _viewSeller(String sellersUID, BuildContext context) async {
   } catch (error) {
     // Handle errors here
     print('Error viewing seller: $error');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('An error occurred while viewing the document'),
+      ),
+    );
   }
 }
+void sendNotificationToSellerNowApproved(String docId, String registrationToken) {
+  FirebaseFirestore.instance.collection("sellers").doc(docId).get().then((DocumentSnapshot snap) {
+    if (snap.exists) {
+      Map<String, dynamic>? userData = snap.data() as Map<String, dynamic>?;
+
+      if (userData != null && userData.containsKey('registrationToken')) {
+        String registrationToken = userData['registrationToken'] as String;
+
+        //send notification
+        AssistantMethods.sendNotificationToSellersApplicationApproved(registrationToken);
+
+
+        if (registrationToken.isNotEmpty) {
+          // Send notification using the registrationToken
+          print('Registration token found: $registrationToken');
+          // Call your notification sending function here with the registrationToken
+        } else {
+          print('Registration token not found or empty.');
+        }
+      } else {
+        print('Registration token not found in user data.');
+      }
+    } else {
+      // Handle the case where the document does not exist
+      print('Seller document not found');
+    }
+  }).catchError((error) {
+    print("Error retrieving user document: $error");
+  });
+}
+
 

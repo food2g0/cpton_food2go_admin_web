@@ -98,7 +98,7 @@ class _TotalSellerScreenState extends State<TotalSellerScreen> {
               TextButton(
                 onPressed: () async {
                   await sellers.doc(sellersUID).update({
-                    'status': 'disapproved',
+                    'status': 'blocked',
                     'blockingReason': blockingReasonController.text,
                   });
 
