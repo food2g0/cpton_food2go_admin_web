@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cpton_food2go_admin_web/assistant/assisstant_method.dart';
+import 'package:cpton_food2go_admin_web/main_screen/Releasing_rider_earnings.dart';
 import 'package:cpton_food2go_admin_web/main_screen/RiderApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/SellersApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/TotalCustomerScreen.dart';
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Releasing Riders Earnings'),
               onTap: () {
                 // Handle products tap
-                Navigator.push(context, MaterialPageRoute(builder: (c)=> ReleasingScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (c)=> ReleasingRiderEarnings()));
               },
             ),
 
