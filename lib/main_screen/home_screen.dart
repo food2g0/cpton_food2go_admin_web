@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cpton_food2go_admin_web/assistant/assisstant_method.dart';
 import 'package:cpton_food2go_admin_web/main_screen/RiderApplicant.dart';
 import 'package:cpton_food2go_admin_web/main_screen/SellersApplicant.dart';
+import 'package:cpton_food2go_admin_web/main_screen/TotalCustomerScreen.dart';
+import 'package:cpton_food2go_admin_web/main_screen/releasing_screen.dart';
 import 'package:cpton_food2go_admin_web/main_screen/total_riders.dart';
 import 'package:cpton_food2go_admin_web/main_screen/total_sellers_screen.dart';
 import 'package:flutter/material.dart';
@@ -159,6 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void viewAllCustomers() {
     // Implement the action for "View All Customers"
     // For example, navigate to a new screen or show a dialog
+     Navigator.push(context, MaterialPageRoute(builder: (c) => TotalCustomerScreen()));
   }
 
   void viewAllRiders() {
@@ -233,19 +236,20 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              title: const Text('Products'),
+              title: const Text('Releasing sellers Earnings'),
               onTap: () {
                 // Handle products tap
-                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (c)=> ReleasingScreen()));
               },
             ),
             ListTile(
-              title: const Text('Settings'),
+              title: const Text('Releasing Riders Earnings'),
               onTap: () {
-                // Handle settings tap
-                Navigator.pop(context);
+                // Handle products tap
+                Navigator.push(context, MaterialPageRoute(builder: (c)=> ReleasingScreen()));
               },
             ),
+
           ],
         ),
       ),

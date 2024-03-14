@@ -2,6 +2,8 @@ import 'package:cpton_food2go_admin_web/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../assistant/assisstant_method.dart';
+
 class RidersApplicants extends StatefulWidget {
   const RidersApplicants({Key? key}) : super(key: key);
 
@@ -61,6 +63,7 @@ class _RidersApplicantsState extends State<RidersApplicants> {
                       final sellersName = doc['riderName'];
                       final sellersEmail = doc['riderEmail'];
                       final sellersAddress = doc['address'];
+                      final registrationToken = doc['registrationToken'];
                       return DataRow(cells: [
                         DataCell(Text(sellersName)),
                         DataCell(Text(sellersEmail)),
@@ -89,6 +92,7 @@ class _RidersApplicantsState extends State<RidersApplicants> {
                               onPressed: () {
                                 // Implement approve button action
                                 _approveSeller(doc.id);
+                                sendNotificationToRiderNowApproved(doc.id, registrationToken);
                               },
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors().green,
@@ -183,5 +187,36 @@ Future<void> _viewSeller(String sellersUID, BuildContext context) async {
     // Handle errors here
     print('Error viewing seller: $error');
   }
+}
+
+void sendNotificationToRiderNowApproved(String docId, String registrationToken) {
+  FirebaseFirestore.instance.collection("riders").doc(docId).get().then((DocumentSnapshot snap) {
+    if (snap.exists) {
+      Map<String, dynamic>? userData = snap.data() as Map<String, dynamic>?;
+
+      if (userData != null && userData.containsKey('registrationToken')) {
+        String registrationToken = userData['registrationToken'] as String;
+
+        //send notification
+        AssistantMethods.sendNotificationToRidersApplicationApproved(registrationToken);
+
+
+        if (registrationToken.isNotEmpty) {
+          // Send notification using the registrationToken
+          print('Registration token found: $registrationToken');
+          // Call your notification sending function here with the registrationToken
+        } else {
+          print('Registration token not found or empty.');
+        }
+      } else {
+        print('Registration token not found in user data.');
+      }
+    } else {
+      // Handle the case where the document does not exist
+      print('Seller document not found');
+    }
+  }).catchError((error) {
+    print("Error retrieving user document: $error");
+  });
 }
 
