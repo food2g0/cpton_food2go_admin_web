@@ -15,6 +15,7 @@ import 'package:charts_flutter_new/flutter.dart' as charts;
 import '../Sales.dart';
 import '../theme/colors.dart';
 import 'Tabel_2.dart';
+import 'TurnOverEarnings.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -248,6 +249,13 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 // Handle products tap
                 Navigator.push(context, MaterialPageRoute(builder: (c)=> ReleasingRiderEarnings()));
+              },
+            ),
+            ListTile(
+              title: const Text('Turn Over Earnings'),
+              onTap: () {
+                // Handle products tap
+                Navigator.push(context, MaterialPageRoute(builder: (c)=> TurnOverEarnings()));
               },
             ),
 
